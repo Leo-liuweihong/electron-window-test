@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>主窗口数据列表</h1>
+    <button>新增</button>
+    <script>
+        setTimeout(()=> {
+            window.ipcRenderer.send("loading:done")
+        }, 1000)
+        const button = document.querySelector("button")
+        button.addEventListener("click", () => {
+            const settings = {
+                url: "add.html",
+                options: {
+                    width: 400,
+                    height: 300,
+                    modal: true
+                },
+                confirm: true
+            }
+            window.ipcRenderer.send("window:open", settings)
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+{
+  "name": "electron-window",
+  "version": "1.0.0",
+  "description": "this is my app",
+  "main": "./src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:win": "electron-builder --win portable",
+    "release:patch": "npm version patch && electron-builder --win portable",
+    "release:min": "npm version minor && electron-builder --win portable",
+    "release:main": "npm version major && electron-builder --win portable"
+  },
+  "keywords": [],
+  "author": "xiaohei",
+  "license": "ISC",
+  "dependencies": {},
+  "build": {
+    "appId": "com.yourcompany.yourapp",
+    "productName": "Your App Name",
+    "copyright": "Copyright © 2024 Your Company Name",
+    "win": {
+      "target": "portable",
+      "icon": "build/star256.ico",
+      "fileAssociations": [
+        {
+          "ext": "myext",
+          "name": "My File Type"
+        }
+      ]
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "build/star256.icns",
+      "category": "public.app-category.productivity"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "build/star256.png"
+    },
+    "portable": {
+      "artifactName": "${productName}-portable-${version}.exe"
+    },
+    "extraMetadata": {
+      "company": "Your Company Name",
+      "description": "A more detailed description of your application"
+    }
+  },
+  "devDependencies": {
+    "electron": "^31.2.0"
+  }
+}

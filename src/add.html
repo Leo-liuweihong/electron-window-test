@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>子窗口-新增数据</h1>
+    <script>
+        window.addEventListener("beforeunload", (event)=> {
+            event.preventDefault()
+            const options = {
+                type: "question",
+                buttons: ["确定", "取消"],
+                defaultId: 1,
+                title: "温馨提示",
+                message: "确认关闭吗？"
+            }
+            const {response} = window.ipcRenderer.invoke("dialog:message-box", options)
+            if(response !== 0) {
+                return
+            }
+            window.ipcRenderer.send("window:close", {force: true})
+        })
+    </script>
+</body>
+</html>
