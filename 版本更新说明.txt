@@ -2,8 +2,14 @@ npm run release:patch  # 增加补丁版本并打包
 npm run release:min  # 增加次要版本并打包
 npm run release:main  # 增加主要版本并打包
 
+git push origin main
+
+
 更新CHANGELOG.md
+# 生成tag，调用工作流
 git tag v1.0.0
 git push origin v1.0.0
 
+git tag -d v1.0.0
+git push origin :refs/tags/v1.0.0
 

@@ -20,13 +20,7 @@
     "copyright": "Copyright © 2024 Your Company Name",
     "win": {
       "target": "portable",
-      "icon": "build/star256.ico",
-      "fileAssociations": [
-        {
-          "ext": "myext",
-          "name": "My File Type"
-        }
-      ]
+      "icon": "build/star256.ico"
     },
     "mac": {
       "target": "dmg",

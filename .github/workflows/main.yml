@@ -10,11 +10,18 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
+      app_name: ${{ steps.get_app_name.outputs.app_name }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Get app name from package.json
+        id: get_app_name
+        run: |
+          APP_NAME=$(node -p "require('./package.json').name")
+          echo "app_name=$APP_NAME" >> $GITHUB_OUTPUT
 
       - name: Generate changelog
         id: changelog
@@ -26,7 +33,7 @@ jobs:
         run: |
           echo "${{ steps.changelog.outputs.changelog }}" > CHANGELOG.md
           echo >> CHANGELOG.md
-          echo "[Full Changelog](https://github.com/${{ github.repository }}/compare/${{ steps.changelog.outputs.last_tag }}...${{ github.ref }})" >> CHANGELOG.md
+          echo "[Full Changelog](/${{ github.repository }}/compare/${{ steps.changelog.outputs.last_tag }}...${{ github.ref }})" >> CHANGELOG.md
 
       - name: Commit CHANGELOG.md
         run: |
@@ -87,8 +94,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ needs.create-release.outputs.upload_url }}
-        asset_path: ./dist/Your App Name-${{ github.ref_name }}.dmg
-        asset_name: Your-App-Name-${{ github.ref_name }}.dmg
+        asset_path: ./dist/${{ needs.create-release.outputs.app_name }}-${{ github.ref_name }}.dmg
+        asset_name: ${{ needs.create-release.outputs.app_name }}-${{ github.ref_name }}.dmg
         asset_content_type: application/octet-stream
 
     - name: Upload Linux Release Asset
@@ -98,8 +105,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ needs.create-release.outputs.upload_url }}
-        asset_path: ./dist/Your App Name-${{ github.ref_name }}.AppImage
-        asset_name: Your-App-Name-${{ github.ref_name }}.AppImage
+        asset_path: ./dist/${{ needs.create-release.outputs.app_name }}-${{ github.ref_name }}.AppImage
+        asset_name: ${{ needs.create-release.outputs.app_name }}-${{ github.ref_name }}.AppImage
         asset_content_type: application/octet-stream
 
     - name: Upload Windows Release Asset
@@ -109,6 +116,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ needs.create-release.outputs.upload_url }}
-        asset_path: ./dist/Your App Name-portable-${{ github.ref_name }}.exe
-        asset_name: Your-App-Name-portable-${{ github.ref_name }}.exe
+        asset_path: ./dist/${{ needs.create-release.outputs.app_name }}-portable-${{ github.ref_name }}.exe
+        asset_name: ${{ needs.create-release.outputs.app_name }}-portable-${{ github.ref_name }}.exe
         asset_content_type: application/octet-stream
