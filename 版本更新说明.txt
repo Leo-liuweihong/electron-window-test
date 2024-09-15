@@ -1,3 +1,9 @@
 npm run release:patch  # 增加补丁版本并打包
 npm run release:min  # 增加次要版本并打包
 npm run release:main  # 增加主要版本并打包
+
+更新CHANGELOG.md
+git tag v1.0.0
+git push origin v1.0.0
+
+

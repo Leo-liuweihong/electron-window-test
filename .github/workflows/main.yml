@@ -12,13 +12,13 @@ jobs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Generate changelog
         id: changelog
-        uses: metcalfc/changelog-generator@v4.0.1
+        uses: metcalfc/changelog-generator@v4.1.0
         with:
           myToken: ${{ secrets.GITHUB_TOKEN }}
 
@@ -56,14 +56,14 @@ jobs:
         os: [macos-latest, ubuntu-latest, windows-latest]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
     
     - name: Setup Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '20'
 
     - name: Install dependencies
       run: npm ci
