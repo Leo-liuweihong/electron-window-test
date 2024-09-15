@@ -1,0 +1,18 @@
+name: 'Your Custom Action Name'
+description: 'Description of your action'
+inputs:
+  release_type:
+    description: '发布类型（例如：major, minor, patch）'
+    required: false
+    default: 'patch'
+outputs:
+  release_url:
+    description: '创建的发布 URL'
+branding:
+  icon: 'package'
+  color: 'blue'
+runs:
+  using: 'node20'
+  main: 'index.js'
+  pre: 'setup.js'
+  post: 'cleanup.js'
