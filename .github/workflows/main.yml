@@ -1,4 +1,3 @@
-
 name: Build and Release Electron App
 
 on:
@@ -48,7 +47,13 @@ jobs:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
     - name: List dist directory
-      run: ls -la dist/
+      run: |
+        if [ "${{ matrix.platform }}" == "win32" ]; then
+          Get-ChildItem dist/
+        else
+          ls -la dist/
+        fi
+      shell: bash
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v3
