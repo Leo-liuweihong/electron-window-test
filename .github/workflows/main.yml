@@ -58,13 +58,13 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.PAT_TOKEN }}  # 使用个人访问令牌
 
     - name: Set up Git
       run: |
         git config --global user.name 'github-actions'
         git config --global user.email 'github-actions@github.com'
-      env:
-        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
     - name: Create Tag
       id: tag
