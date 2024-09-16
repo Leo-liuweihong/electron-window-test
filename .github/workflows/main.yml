@@ -26,13 +26,7 @@ jobs:
         cache: 'npm'
 
     - name: Install dependencies
-      run: |
-        if [ -f package-lock.json ]; then
-          npm ci
-        else
-          echo "Warning: No lock file found. Running npm install instead."
-          npm install
-        fi
+      run: npm ci
 
     - name: Install electron-builder
       run: npm install electron-builder@latest
