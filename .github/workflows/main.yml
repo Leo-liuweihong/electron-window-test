@@ -124,4 +124,5 @@ jobs:
         asset_content_type: application/octet-stream
 
     - name: Output Release URL
-      run: echo "Release URL: ${{ needs.create-release.outputs.release_url }}"
+      run: |
+        echo "Release URL: ${{ needs.create-release.outputs.release_url }}"
