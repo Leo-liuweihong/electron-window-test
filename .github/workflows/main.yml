@@ -14,7 +14,6 @@ jobs:
       matrix:
         platform: [win32, mac, linux]
 
-    # 使用条件表达式来选择操作系统
     runs-on: ${{ matrix.platform == 'win32' && 'windows-latest' || matrix.platform == 'mac' && 'macos-latest' || 'ubuntu-latest' }}
 
     steps:
@@ -44,16 +43,7 @@ jobs:
         fi
       env:
         ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: true
-
-    - name: Create Release Notes
-      id: create_release_notes
-      run: |
-        echo "## Changes" > release_notes.md
-        echo "" >> release_notes.md
-        awk '/^## $/{flag=0} flag; /^## \['$GITHUB_REF_NAME'$/{flag=1}' CHANGELOG.md >> release_notes.md
-        echo "" >> release_notes.md
-        echo "## Compare Changes" >> release_notes.md
-        echo "[$GITHUB_REF_NAME...main](https://github.com/${GITHUB_REPOSITORY}/compare/$GITHUB_REF_NAME...main)" >> release_notes.md
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v3
@@ -80,7 +70,7 @@ jobs:
         files: ./dist/*
         body_path: ./release_notes.md
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
     - name: Update CHANGELOG.md
       run: |
@@ -90,4 +80,4 @@ jobs:
         git commit -m "Update CHANGELOG.md with compare link for $GITHUB_REF_NAME"
         git push
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
