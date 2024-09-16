@@ -61,9 +61,7 @@ jobs:
         git config --global user.name 'github-actions'
         git config --global user.email 'github-actions@github.com'
         git tag -a v${{ github.run_number }} -m "Release v${{ github.run_number }}"
-        git push origin v${{ github.run_number }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }} v${{ github.run_number }}
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v3
@@ -103,6 +101,4 @@ jobs:
         git config --global user.email 'github-actions@github.com'
         git add CHANGELOG.md
         git commit -m "Update CHANGELOG.md with compare link for $GITHUB_REF_NAME"
-        git push
-      env:
-        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}
