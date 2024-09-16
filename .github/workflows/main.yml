@@ -14,7 +14,8 @@ jobs:
       matrix:
         platform: [win32, mac, linux]
 
-    runs-on: ${{ matrix.platform == 'win32' && 'windows-latest' || 'ubuntu-latest' }}
+    # 使用条件表达式来选择操作系统
+    runs-on: ${{ matrix.platform == 'win32' && 'windows-latest' || matrix.platform == 'mac' && 'macos-latest' || 'ubuntu-latest' }}
 
     steps:
     - name: Checkout code
@@ -37,9 +38,9 @@ jobs:
         if [ "${{ matrix.platform }}" == "win32" ]; then
           npm run build:win
         elif [ "${{ matrix.platform }}" == "mac" ]; then
-          electron-builder --mac
+          npm run build:mac
         elif [ "${{ matrix.platform }}" == "linux" ]; then
-          electron-builder --linux
+          npm run build:linux
         fi
       env:
         ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: true
