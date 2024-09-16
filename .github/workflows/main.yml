@@ -46,23 +46,6 @@ jobs:
         ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: true
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-    - name: List dist directory
-      run: |
-        if [ "${{ matrix.platform }}" == "win32" ]; then
-          pwsh -command "Get-ChildItem dist/"
-        else
-          ls -la dist/
-        fi
-      shell: bash
-
-    - name: Create Git Tag
-      if: github.ref == 'refs/heads/main'
-      run: |
-        git config --global user.name 'github-actions'
-        git config --global user.email 'github-actions@github.com'
-        git tag -a v${{ github.run_number }} -m "Release v${{ github.run_number }}"
-        git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }} v${{ github.run_number }}
-
     - name: Upload Artifacts
       uses: actions/upload-artifact@v3
       with:
@@ -72,10 +55,6 @@ jobs:
   release:
     runs-on: ubuntu-latest
     needs: build
-    strategy:
-      matrix:
-        platform: [win32, mac, linux]
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -91,7 +70,6 @@ jobs:
       with:
         files: ./dist/*
         body_path: ./release_notes.md
-        tag_name: v${{ github.run_number }}
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
@@ -102,3 +80,5 @@ jobs:
         git add CHANGELOG.md
         git commit -m "Update CHANGELOG.md with compare link for $GITHUB_REF_NAME"
         git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
