@@ -8,6 +8,7 @@ on:
 env:
   NODE_VERSION: '20'
   NODE_ENV: production
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: true
 
 jobs:
   create-release:
