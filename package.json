@@ -13,7 +13,6 @@
   "keywords": [],
   "author": "xiaohei",
   "license": "ISC",
-  "dependencies": {},
   "build": {
     "appId": "com.yourcompany.yourapp",
     "productName": "Your App Name",
