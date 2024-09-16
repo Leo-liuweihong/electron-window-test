@@ -1,56 +1,127 @@
 name: Release
 
 on:
-  push:
+  
+  
+push:
     tags:
       - 'v*' # 监听以 "v" 开头的标签
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      
+     
+matrix:
+        
+      
+os: [ubuntu-latest, macos-latest, windows-latest]
+    
+    
+    
+    
+runs-on: ${{ matrix.os }}
 
     steps:
-    - name: Checkout code
+    
+    
+- name: Checkout code
       uses: actions/checkout@v3
 
     - name: Set up Node.js
-      uses: actions/setup-node@v3
+      
+      
+
+ 
+uses: actions/setup-node@v3
       with:
-        node-version: '20' # 使用 Node.js 20 及以上版本
+        
+     
+node-version: '20' # 使用 Node.js 20 及以上版本
 
     - name: Install dependencies
-      run: npm install
+      run: npm ci
 
     - name: Install electron-builder
       run: npm install electron-builder@latest
 
-    - name: Build Windows
+    
+
+   
+- name: Build for Windows
+      
+ 
+if: matrix.os == 'windows-latest'
       run: npm run build:win
 
-    - name: Build Mac
-      run: electron-builder --mac
+    - name: Build for macOS
+      
+ 
+if: matrix.os == 'macos-latest'
+      
+     
+run: npm run build:mac
 
-    - name: Build Linux
-      run: electron-builder --linux
+    - name: Build for Linux
+      
+     
+if: matrix.os == 'ubuntu-latest'
+      
+    
+run: npm run build:linux
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        
+    
+name: dist-${{ matrix.os }}
+        
+        
+path: dist
+
+  create-release:
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+    
+ 
+- name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Download all artifacts
+      
+    
+uses: actions/download-artifact@v3
+      
+    
+with:
+        path: artifacts
 
     - name: Create Release Notes
       id: create_release_notes
-      run: |
+      
+  
+run: |
         echo "## Changes" > release_notes.md
         echo "" >> release_notes.md
         awk '/^## \[/{flag=0} flag; /^## \['$GITHUB_REF_NAME'\]/{flag=1}' CHANGELOG.md >> release_notes.md
         echo "" >> release_notes.md
         echo "## Compare Changes" >> release_notes.md
-        echo "[$GITHUB_REF_NAME...main](https://github.com/${GITHUB_REPOSITORY}/compare/$GITHUB_REF_NAME...main)" >> CHANGELOG.md
+        echo "[$GITHUB_REF_NAME...main](https://github.com/${{ github.repository }}/compare/$GITHUB_REF_NAME...main)" >> release_notes.md
 
     - name: Create Release
       uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          dist/*.exe
-          dist/*.dmg
-          dist/*.AppImage
-        body_path: ./release_notes.md
+      
+   
+with:
+        
+        
+files: artifacts/**/*
+        
+     
+body_path: ./release_notes.md
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -58,6 +129,11 @@ jobs:
       run: |
         git config --global user.name 'github-actions'
         git config --global user.email 'github-actions@github.com'
+        echo "[$GITHUB_REF_NAME...main](https://github.com/${{ github.repository }}/compare/$GITHUB_REF_NAME...main)" >> CHANGELOG.md
         git add CHANGELOG.md
         git commit -m "Update CHANGELOG.md with compare link for $GITHUB_REF_NAME"
         git push
+
+        
+
+ 

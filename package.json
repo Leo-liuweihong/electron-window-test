@@ -5,7 +5,7 @@
   "main": "./src/main.js",
   "scripts": {
     "start": "electron .",
-    "build:win": "electron-builder --win portable",
+    "build:win": "electron-builder --win",
     "build:mac": "electron-builder --mac",
     "build:linux": "electron-builder --linux",
     "release:patch": "npm version patch && electron-builder --win portable",
