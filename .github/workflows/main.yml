@@ -10,11 +10,10 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
     strategy:
       matrix:
         platform: [win32, mac, linux]
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -40,6 +39,8 @@ jobs:
         elif [ "${{ matrix.platform }}" == "linux" ]; then
           electron-builder --linux
         fi
+      env:
+        ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: true
 
     - name: Create Release Notes
       id: create_release_notes
