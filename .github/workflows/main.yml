@@ -1,129 +1,63 @@
-name: Build and Release
+name: Release
 
 on:
   push:
     tags:
-      - 'v*'
-
-env:
-  NODE_VERSION: '20'
-  NODE_ENV: production
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: true
+      - 'v*' # 监听以 "v" 开头的标签
 
 jobs:
-  create-release:
-    runs-on: ubuntu-latest
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-      app_name: ${{ steps.get_app_name.outputs.app_name }}
-      release_url: ${{ steps.create_release.outputs.html_url }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Get app name from package.json
-        id: get_app_name
-        run: |
-          APP_NAME=$(node -p "require('./package.json').name")
-          echo "app_name=$APP_NAME" >> $GITHUB_OUTPUT
-
-      - name: Generate changelog
-        id: changelog
-        uses: metcalfc/changelog-generator@v4.1.0
-        with:
-          myToken: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Update CHANGELOG.md
-        run: |
-          echo "${{ steps.changelog.outputs.changelog }}" > CHANGELOG.md
-          echo >> CHANGELOG.md
-          echo "[Full Changelog](/${{ github.repository }}/compare/${{ steps.changelog.outputs.last_tag }}...${{ github.ref }})" >> CHANGELOG.md
-
-      - name: Commit CHANGELOG.md
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add CHANGELOG.md
-          git commit -m "Update CHANGELOG.md for ${{ github.ref }}" || echo "No changes to commit"
-          git push
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body_path: CHANGELOG.md
-          draft: false
-          prerelease: false
-
   build:
-    needs: create-release
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
       with:
-        node-version: ${{ env.NODE_VERSION }}
+        node-version: '20' # 使用 Node.js 20 及以上版本
 
     - name: Install dependencies
-      run: npm ci
+      run: npm install
 
-    - name: Build for macOS
-      if: matrix.os == 'macos-latest'
-      run: npm run build:mac
+    - name: Install electron-builder
+      run: npm install electron-builder@latest
 
-    - name: Build for Linux
-      if: matrix.os == 'ubuntu-latest'
-      run: npm run build:linux
-
-    - name: Build for Windows
-      if: matrix.os == 'windows-latest'
+    - name: Build Windows
       run: npm run build:win
 
-    - name: Upload macOS Release Asset
-      if: matrix.os == 'macos-latest'
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ needs.create-release.outputs.upload_url }}
-        asset_path: ./dist/${{ needs.create-release.outputs.app_name }}-${{ github.ref_name }}.dmg
-        asset_name: ${{ needs.create-release.outputs.app_name }}-${{ github.ref_name }}.dmg
-        asset_content_type: application/octet-stream
+    - name: Build Mac
+      run: electron-builder --mac
 
-    - name: Upload Linux Release Asset
-      if: matrix.os == 'ubuntu-latest'
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ needs.create-release.outputs.upload_url }}
-        asset_path: ./dist/${{ needs.create-release.outputs.app_name }}-${{ github.ref_name }}.AppImage
-        asset_name: ${{ needs.create-release.outputs.app_name }}-${{ github.ref_name }}.AppImage
-        asset_content_type: application/octet-stream
+    - name: Build Linux
+      run: electron-builder --linux
 
-    - name: Upload Windows Release Asset
-      if: matrix.os == 'windows-latest'
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ needs.create-release.outputs.upload_url }}
-        asset_path: ./dist/${{ needs.create-release.outputs.app_name }}-portable-${{ github.ref_name }}.exe
-        asset_name: ${{ needs.create-release.outputs.app_name }}-portable-${{ github.ref_name }}.exe
-        asset_content_type: application/octet-stream
-
-    - name: Output Release URL
+    - name: Create Release Notes
+      id: create_release_notes
       run: |
-        echo "Release URL: ${{ needs.create-release.outputs.release_url }}"
+        echo "## Changes" > release_notes.md
+        echo "" >> release_notes.md
+        awk '/^## \[/{flag=0} flag; /^## \['$GITHUB_REF_NAME'\]/{flag=1}' CHANGELOG.md >> release_notes.md
+        echo "" >> release_notes.md
+        echo "## Compare Changes" >> release_notes.md
+        echo "[$GITHUB_REF_NAME...main](https://github.com/${GITHUB_REPOSITORY}/compare/$GITHUB_REF_NAME...main)" >> CHANGELOG.md
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          dist/*.exe
+          dist/*.dmg
+          dist/*.AppImage
+        body_path: ./release_notes.md
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Update CHANGELOG.md
+      run: |
+        git config --global user.name 'github-actions'
+        git config --global user.email 'github-actions@github.com'
+        git add CHANGELOG.md
+        git commit -m "Update CHANGELOG.md with compare link for $GITHUB_REF_NAME"
+        git push
