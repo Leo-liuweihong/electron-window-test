@@ -6,6 +6,8 @@
   "scripts": {
     "start": "electron .",
     "build:win": "electron-builder --win portable",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux",
     "release:patch": "npm version patch && electron-builder --win portable",
     "release:min": "npm version minor && electron-builder --win portable",
     "release:main": "npm version major && electron-builder --win portable"
@@ -15,12 +17,14 @@
   "license": "ISC",
   "build": {
     "appId": "com.yourcompany.yourapp",
-    "productName": "Your App Name",
+    "productName": "electron-window",
     "copyright": "Copyright © 2024 Your Company Name",
+    "electronDownload": {
+      "mirror": "https://github.com/electron/electron/releases/download/"
+    },
     "win": {
       "target": "portable",
-      "icon": "build/star256.ico",
-      "sign": false
+      "icon": "build/star256.ico"
     },
     "mac": {
       "target": "dmg",
@@ -40,7 +44,7 @@
     }
   },
   "devDependencies": {
-    "electron": "^31.2.0",
+    "electron": "^23.0.0",
     "electron-builder": "^25.0.5"
   }
 }
