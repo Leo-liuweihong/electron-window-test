@@ -49,7 +49,7 @@ jobs:
     - name: List dist directory
       run: |
         if [ "${{ matrix.platform }}" == "win32" ]; then
-          Get-ChildItem dist/
+          pwsh -command "Get-ChildItem dist/"
         else
           ls -la dist/
         fi
