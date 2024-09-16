@@ -55,6 +55,16 @@ jobs:
         fi
       shell: bash
 
+    - name: Create Git Tag
+      if: github.ref == 'refs/heads/main'
+      run: |
+        git config --global user.name 'github-actions'
+        git config --global user.email 'github-actions@github.com'
+        git tag -a v${{ github.run_number }} -m "Release v${{ github.run_number }}"
+        git push origin v${{ github.run_number }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
     - name: Upload Artifacts
       uses: actions/upload-artifact@v3
       with:
@@ -83,6 +93,7 @@ jobs:
       with:
         files: ./dist/*
         body_path: ./release_notes.md
+        tag_name: v${{ github.run_number }}
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
