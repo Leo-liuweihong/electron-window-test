@@ -4,7 +4,6 @@ npm run release:main  # 增加主要版本并打包
 
 git push origin main
 
-
 更新CHANGELOG.md
 # 生成tag，调用工作流
 git tag v1.0.0
