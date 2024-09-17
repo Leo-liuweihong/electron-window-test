@@ -4,4 +4,7 @@ dist/
 main_save.yml
 main_save_build.yml
 main_save_build_v*.yml
+win32-release.zip
+mac-release.zip
+linux-release.tar.gz
 

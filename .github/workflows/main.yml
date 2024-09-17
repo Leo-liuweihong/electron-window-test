@@ -124,8 +124,11 @@ jobs:
 
     - name: Update CHANGELOG.md
       run: |
-        git add CHANGELOG.md
-        git commit -m "Update CHANGELOG.md with compare link for $GITHUB_REF_NAME"
+        echo "win32-release.zip" >> .gitignore
+        echo "mac-release.zip" >> .gitignore
+        echo "linux-release.tar.gz" >> .gitignore
+        git add .gitignore CHANGELOG.md
+        git commit -m "Update CHANGELOG.md with compare link for $GITHUB_REF_NAME" --allow-empty
         git push
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
