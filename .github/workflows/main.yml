@@ -7,8 +7,10 @@ on:
   pull_request:
     branches:
       - main
+
 permissions:
   contents: write
+
 jobs:
   build:
     strategy:
@@ -67,14 +69,17 @@ jobs:
         git config --global user.name 'github-actions'
         git config --global user.email 'github-actions@github.com'
 
+    - name: Get version from package.json
+      id: get_version
+      run: echo "VERSION=$(jq -r '.version' package.json)" >> $GITHUB_ENV
+
     - name: Create and Push Tag
-      id: tag
+      id: create_tag
       run: |
-        VERSION=$(jq -r ".version" package.json)
-        git tag -d "v$VERSION" || true
-        git push --delete origin "v$VERSION" || true
-        git tag -a "v$VERSION" -m "Release version $VERSION"
-        git push origin "v$VERSION"
+        git tag -d "v${{ env.VERSION }}" || true
+        git push --delete origin "v${{ env.VERSION }}" || true
+        git tag -a "v${{ env.VERSION }}" -m "Release version ${{ env.VERSION }}"
+        git push origin "v${{ env.VERSION }}"
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
@@ -99,7 +104,7 @@ jobs:
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: ${{ steps.tag.outputs.tag }}
+        tag_name: v${{ env.VERSION }}
         files: ./dist/**/* # Match all files in all subdirectories
         body_path: ./release_notes.md
       env:
