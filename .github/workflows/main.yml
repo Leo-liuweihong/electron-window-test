@@ -67,10 +67,12 @@ jobs:
         git config --global user.name 'github-actions'
         git config --global user.email 'github-actions@github.com'
 
-    - name: Create Tag
+    - name: Create and Push Tag
       id: tag
       run: |
         VERSION=$(jq -r ".version" package.json)
+        git tag -d "v$VERSION" || true
+        git push --delete origin "v$VERSION" || true
         git tag -a "v$VERSION" -m "Release version $VERSION"
         git push origin "v$VERSION"
       env:
