@@ -101,11 +101,23 @@ jobs:
         name: linux-build
         path: ./dist/linux
 
+    - name: Create Zip for Win32
+      run: zip -r win32-release.zip ./dist/win32
+
+    - name: Create Zip for Mac
+      run: zip -r mac-release.zip ./dist/mac
+
+    - name: Create Tarball for Linux
+      run: tar -czvf linux-release.tar.gz -C ./dist/linux .
+
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
         tag_name: v${{ env.VERSION }}
-        files: ./dist/**/* # Match all files in all subdirectories
+        files: |
+          win32-release.zip
+          mac-release.zip
+          linux-release.tar.gz
         body_path: ./release_notes.md
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
