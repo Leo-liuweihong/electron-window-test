@@ -1,7 +1,7 @@
 {
   "name": "electron-window",
   "version": "1.0.0",
-  "description": "this is my app",
+  "description": "this is my app 1",
   "main": "./src/main.js",
   "scripts": {
     "start": "electron .",
