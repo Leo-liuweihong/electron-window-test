@@ -10,6 +10,7 @@ function createWindow(url, options={}) {
         webPreferences: {
             nodeIntegration: true,
             preload: path.join(__dirname, "preload.js")
+            
         }
     }
     //assign会后面的覆盖前面的
